@@ -1,4 +1,4 @@
 module.exports = {
-  ApplicantTest: require("./ApplicantTest"),
-  TechnicalTest: require("./TechnicalTest")
-}
+	ApplicantTest: require("./ApplicantTest"),
+	TechnicalTest: require("./TechnicalTest"),
+};

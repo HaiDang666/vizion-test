@@ -1,6 +1,6 @@
 const express = require("express");
 const { body } = require("express-validator");
-const multer  = require('multer');
+const multer = require("multer");
 const upload = multer({ dest: "uploads/" });
 
 const controller = require("../controller/applicantTests");
@@ -75,10 +75,7 @@ const router = express.Router();
 
 router.post(
 	"/",
-	body("email")
-		.notEmpty()
-		.isEmail()
-		.isLength({ max: 100 }),
+	body("email").notEmpty().isEmail().isLength({ max: 100 }),
 	body("testId").notEmpty(),
 	controller.postApplicantTest
 );
@@ -125,7 +122,7 @@ router.post(
 
 router.post(
 	"/:applicantTestId",
-  upload.single('file'),
+	upload.single("file"),
 	controller.postApplicantTestResult
 );
 

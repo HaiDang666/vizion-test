@@ -31,50 +31,56 @@ const controller = {
 		res.status(200).json(makeResponse("SUCCESS", newApplicant));
 	},
 
-  postApplicantTestResult: async (req, res) => {
-    const { applicantTestId } = req.params;
-    const applicantTest = await ApplicantTest.findOne({ Id: applicantTestId });
-    if (!applicantTest) {
-      return res.status(404).json(makeResponse("TEST_NOT_FOUND"));
-    }
+	postApplicantTestResult: async (req, res) => {
+		const { applicantTestId } = req.params;
+		const applicantTest = await ApplicantTest.findOne({
+			Id: applicantTestId,
+		});
+		if (!applicantTest) {
+			return res.status(404).json(makeResponse("TEST_NOT_FOUND"));
+		}
 
-    if (applicantTest.SubmitDate) {
-      return res.status(400).json(makeResponse("NO_RESUBMIT"));
-    }
+		if (applicantTest.SubmitDate) {
+			return res.status(400).json(makeResponse("NO_RESUBMIT"));
+		}
 
-    const { file } = req;
-    let fileUrl = "";
-    if (file) {
-      if (file.mimetype !== "application/zip" || file.size >= 10000000) {
-        deleteFile(file.path);
-        return res.status(400).json(makeResponse("INVALID_FILE"));
-      }
+		const { file } = req;
+		let fileUrl = "";
+		if (file) {
+			if (file.mimetype !== "application/zip" || file.size >= 10000000) {
+				deleteFile(file.path);
+				return res.status(400).json(makeResponse("INVALID_FILE"));
+			}
 
-      fileUrl = await uploadToAzure(file, applicantTest.id);
-      deleteFile(file.path);
-      if (!fileUrl) {
-        return res.status(500).json(makeResponse("UPLOAD_FAILED"));
-      }
-    }
+			fileUrl = await uploadToAzure(file, applicantTest.id);
+			deleteFile(file.path);
+			if (!fileUrl) {
+				return res.status(500).json(makeResponse("UPLOAD_FAILED"));
+			}
+		}
 
-    const { gitRepo, note } = req.body;
-    if (!gitRepo && !fileUrl) {
-      return res.status(400).json(makeResponse("INVALID_INPUT"));
-    }
+		const { gitRepo, note } = req.body;
+		if (!gitRepo && !fileUrl) {
+			return res.status(400).json(makeResponse("INVALID_INPUT"));
+		}
 
-    const updatedApplicantTest = await ApplicantTest.findOneAndUpdate({
-      id: applicantTest.id,
-    }, {
-      ...(gitRepo && {GitRepo: gitRepo}),
-      ...(note && {Note: note}),
-      ...(fileUrl && {FileUrl: fileUrl}),
-      SubmitDate: new Date(),
-    }, {
-      new: true
-    })
+		const updatedApplicantTest = await ApplicantTest.findOneAndUpdate(
+			{
+				id: applicantTest.id,
+			},
+			{
+				...(gitRepo && { GitRepo: gitRepo }),
+				...(note && { Note: note }),
+				...(fileUrl && { FileUrl: fileUrl }),
+				SubmitDate: new Date(),
+			},
+			{
+				new: true,
+			}
+		);
 
-    res.status(200).json(makeResponse("SUCCESS", updatedApplicantTest));
-  }
+		res.status(200).json(makeResponse("SUCCESS", updatedApplicantTest));
+	},
 };
 
 module.exports = controller;

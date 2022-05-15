@@ -30,7 +30,7 @@ mongoose.connect(
 	{ useNewUrlParser: true, useUnifiedTopology: true },
 	(err) => {
 		if (err) {
-      console.log(err);
+			console.log(err);
 			console.log(
 				"MongoDB Connection Error. Please make sure that MongoDB is running."
 			);
